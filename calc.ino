@@ -12,6 +12,10 @@ double fabs_(double num) {
   return num;
 }
 
+long _lround(double f) {
+  return (long)round(f);
+}
+
 const int V_in = 5;    // voltage at 5V pin of arduino
 double V_out = 0;      // voltage at res_pin pin of arduino
 
@@ -32,24 +36,24 @@ double current = 0.0;
 double last = 0.0;
 bool hasSign = false;
 
-const double TOTAL_RES = 38.0 * KOhm;
-double BUTTON_NUM1[2] = {36.7 * KOhm, 37.3 * KOhm}; //  -1
-double BUTTON_NUM2[2] = {35.7 * KOhm, 36.3 * KOhm}; //  -2
-double BUTTON_NUM3[2] = {33.7 * KOhm, 34.3 * KOhm}; //  -4
-double BUTTON_NUM4[2] = {29.7 * KOhm, 30.3 * KOhm}; //  -8
-double BUTTON_NUM5[2] = {15.7 * KOhm, 16.3 * KOhm}; // -22
-double BUTTON_NUM6[2] = {34.7 * KOhm, 35.3 * KOhm}; //  -1  -2
-double BUTTON_NUM7[2] = {31.7 * KOhm, 32.3 * KOhm}; //  -2  -4
-double BUTTON_NUM8[2] = {25.7 * KOhm, 26.3 * KOhm}; //  -4  -8
-double BUTTON_NUM9[2] = { 7.7 * KOhm,  8.3 * KOhm}; //  -8 -22
-double BUTTON_NUM0[2] = {30.7 * KOhm, 31.3 * KOhm}; //  -1  -2  -4
-double BUTTON_ADD [2] = {23.7 * KOhm, 24.3 * KOhm}; //  -2  -4  -8
-double BUTTON_MINU[2] = { 3.7 * KOhm,  4.3 * KOhm}; //  -4  -8 -22
-double BUTTON_MULT[2] = {22.7 * KOhm, 23.3 * KOhm}; //  -1  -2  -4  -8
-double BUTTON_DIVI[2] = { 1.7 * KOhm,  2.3 * KOhm}; //  -2  -4  -8 -22
-double BUTTON_EQUA[2] = { 0.7 * KOhm,  1.3 * KOhm}; //  -1  -2  -4  -8 -22
-double BUTTON_CLR [2] = {32.7 * KOhm, 33.3 * KOhm}; //  -1  -4
-double BUTTON_OPPO[2] = {28.7 * KOhm, 29.3 * KOhm}; //  -1  -8
+const double TOTAL_RES = 85.1 * KOhm;
+double BUTTON_NUM1[2] = {83.0 * KOhm, 84.2 * KOhm};
+double BUTTON_NUM2[2] = {81.0 * KOhm, 81.3 * KOhm};
+double BUTTON_NUM3[2] = {74.1 * KOhm, 74.3 * KOhm};
+double BUTTON_NUM4[2] = {64.1 * KOhm, 64.3 * KOhm};
+double BUTTON_NUM5[2] = {37.1 * KOhm, 37.3 * KOhm};
+double BUTTON_NUM6[2] = {77.4 * KOhm, 78.3 * KOhm};
+double BUTTON_NUM7[2] = {31.7 * KOhm, 32.3 * KOhm};
+double BUTTON_NUM8[2] = {25.7 * KOhm, 26.3 * KOhm};
+double BUTTON_NUM9[2] = { 7.7 * KOhm,  8.3 * KOhm};
+double BUTTON_NUM0[2] = {30.7 * KOhm, 31.3 * KOhm};
+double BUTTON_ADD [2] = {23.7 * KOhm, 24.3 * KOhm};
+double BUTTON_MINU[2] = { 3.7 * KOhm,  4.3 * KOhm};
+double BUTTON_MULT[2] = {22.7 * KOhm, 23.3 * KOhm};
+double BUTTON_DIVI[2] = { 1.7 * KOhm,  2.3 * KOhm};
+double BUTTON_EQUA[2] = { 0.7 * KOhm,  1.3 * KOhm};
+double BUTTON_CLR [2] = {32.7 * KOhm, 33.3 * KOhm};
+double BUTTON_OPPO[2] = {28.7 * KOhm, 29.3 * KOhm};
 
 char getCharFromRes(double res) {
   if(res >= TOTAL_RES - 0.3 * KOhm) {
@@ -116,7 +120,7 @@ void displayDbl(double num) {
     oldRes = newRes;
   }
   lcd.print(" (");
-  lcd.print((long)(oldRes / 1000 + 0.5));
+  lcd.print(double(_lround(oldRes / 1000 * 100)) / 100);
   lcd.print(" kOhm)");
 #endif
 }
