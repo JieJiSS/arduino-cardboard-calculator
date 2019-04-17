@@ -37,23 +37,23 @@ double last = 0.0;
 bool hasSign = false;
 
 const double TOTAL_RES = 85.1 * KOhm;
-double BUTTON_NUM1[2] = {83.0 * KOhm, 84.2 * KOhm};
-double BUTTON_NUM2[2] = {81.0 * KOhm, 81.3 * KOhm};
-double BUTTON_NUM3[2] = {74.1 * KOhm, 74.3 * KOhm};
-double BUTTON_NUM4[2] = {64.1 * KOhm, 64.3 * KOhm};
-double BUTTON_NUM5[2] = {37.1 * KOhm, 37.3 * KOhm};
-double BUTTON_NUM6[2] = {77.4 * KOhm, 78.3 * KOhm};
-double BUTTON_NUM7[2] = {31.7 * KOhm, 32.3 * KOhm};
-double BUTTON_NUM8[2] = {25.7 * KOhm, 26.3 * KOhm};
-double BUTTON_NUM9[2] = { 7.7 * KOhm,  8.3 * KOhm};
-double BUTTON_NUM0[2] = {30.7 * KOhm, 31.3 * KOhm};
-double BUTTON_ADD [2] = {23.7 * KOhm, 24.3 * KOhm};
-double BUTTON_MINU[2] = { 3.7 * KOhm,  4.3 * KOhm};
-double BUTTON_MULT[2] = {22.7 * KOhm, 23.3 * KOhm};
-double BUTTON_DIVI[2] = { 1.7 * KOhm,  2.3 * KOhm};
-double BUTTON_EQUA[2] = { 0.7 * KOhm,  1.3 * KOhm};
-double BUTTON_CLR [2] = {32.7 * KOhm, 33.3 * KOhm};
-double BUTTON_OPPO[2] = {28.7 * KOhm, 29.3 * KOhm};
+double BUTTON_OPPO[2] = {83.0 * KOhm, 83.2 * KOhm};
+double BUTTON_DIVI[2] = {80.0 * KOhm, 81.3 * KOhm};
+double BUTTON_MULT[2] = {74.8 * KOhm, 75.1 * KOhm};
+double BUTTON_MINU[2] = {64.7 * KOhm, 64.9 * KOhm};
+double BUTTON_ADD [2] = {37.3 * KOhm, 37.6 * KOhm};
+double BUTTON_NUM0[2] = {79.1 * KOhm, 79.4 * KOhm};
+double BUTTON_NUM9[2] = {70.0 * KOhm, 70.4 * KOhm};
+double BUTTON_NUM8[2] = {54.3 * KOhm, 54.6 * KOhm};
+double BUTTON_NUM7[2] = {17.2 * KOhm, 17.4 * KOhm};
+double BUTTON_NUM6[2] = {68.7 * KOhm, 69.0 * KOhm};
+double BUTTON_NUM5[2] = {50.0 * KOhm, 50.2 * KOhm};
+double BUTTON_NUM4[2] = { 7.0 * KOhm,  7.4 * KOhm};
+double BUTTON_NUM3[2] = {48.0 * KOhm, 48.3 * KOhm};
+double BUTTON_NUM2[2] = { 2.7 * KOhm,  3.0 * KOhm};
+double BUTTON_NUM1[2] = {40.2 * KOhm, 40.5 * KOhm};
+double BUTTON_EQUA[2] = { 1.2 * KOhm,  1.5 * KOhm};
+double BUTTON_CLR [2] = { 4.1 * KOhm,  4.4 * KOhm};
 
 char getCharFromRes(double res) {
   if(res >= TOTAL_RES - 0.3 * KOhm) {
@@ -62,7 +62,7 @@ char getCharFromRes(double res) {
     }
     return 'N';
   }
-  if(BUTTON_NUM1[0] <= res && res <= BUTTON_NUM1[1])
+  else if(BUTTON_NUM1[0] <= res && res <= BUTTON_NUM1[1])
       return '1';
   else if(BUTTON_NUM2[0] <= res && res <= BUTTON_NUM2[1])
       return '2';
@@ -92,8 +92,10 @@ char getCharFromRes(double res) {
       return '/';
   else if(BUTTON_EQUA[0] <= res && res <= BUTTON_EQUA[1])
       return '=';
-  else if(BUTTON_CLR [0] <= res && res <= BUTTON_CLR [1])
+  else if(BUTTON_OPPO[0] <= res && res <= BUTTON_OPPO[1])
       return '#';
+  else if(BUTTON_CLR [0] <= res && res <= BUTTON_CLR [1])
+      return '!';
   else {
       Serial.print("Failed to match resistance: ");
       Serial.print(res / 1000);
@@ -120,7 +122,7 @@ void displayDbl(double num) {
     oldRes = newRes;
   }
   lcd.print(" (");
-  lcd.print(double(_lround(oldRes / 1000 * 100)) / 100);
+  lcd.print(int(_lround(oldRes / 1000)));
   lcd.print(" kOhm)");
 #endif
 }
@@ -277,10 +279,10 @@ void loop() {
   displayDbl(current);
 
   lastTap = millis();
-  /*char ch = getCharFromRes(currResist);
+  char ch = getCharFromRes(currResist);
   if(ch == 'N') {
     return;
   }
-  handleChar(ch);*/
+  handleChar(ch);
   delay(80);
 }
