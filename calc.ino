@@ -5,6 +5,9 @@
 #define CALC_DBG 1
 const int res_pin = A0;
 
+char lastOp = ' ';
+short loopCnt = 0;
+
 LiquidCrystal_I2C lcd(0x27, 16, 1);
 
 double fabs_(double num) {
@@ -37,11 +40,11 @@ double last = 0.0;
 bool hasSign = false;
 
 const double TOTAL_RES = 85.1 * KOhm;
-double BUTTON_OPPO[2] = {83.0 * KOhm, 83.2 * KOhm};
-double BUTTON_DIVI[2] = {80.0 * KOhm, 81.3 * KOhm};
-double BUTTON_MULT[2] = {74.8 * KOhm, 75.1 * KOhm};
-double BUTTON_MINU[2] = {64.7 * KOhm, 64.9 * KOhm};
-double BUTTON_ADD [2] = {37.3 * KOhm, 37.6 * KOhm};
+double BUTTON_OPPO[2] = {83.4 * KOhm, 84.4 * KOhm};
+double BUTTON_DIVI[2] = {80.0 * KOhm, 81.4 * KOhm};
+double BUTTON_MULT[2] = {74.5 * KOhm, 75.9 * KOhm};
+double BUTTON_MINU[2] = {64.7 * KOhm, 65.9 * KOhm};
+double BUTTON_ADD [2] = {37.3 * KOhm, 38.6 * KOhm};
 double BUTTON_NUM0[2] = {79.1 * KOhm, 79.4 * KOhm};
 double BUTTON_NUM9[2] = {70.0 * KOhm, 70.4 * KOhm};
 double BUTTON_NUM8[2] = {54.3 * KOhm, 54.6 * KOhm};
@@ -49,11 +52,11 @@ double BUTTON_NUM7[2] = {17.2 * KOhm, 17.4 * KOhm};
 double BUTTON_NUM6[2] = {68.7 * KOhm, 69.0 * KOhm};
 double BUTTON_NUM5[2] = {50.0 * KOhm, 50.2 * KOhm};
 double BUTTON_NUM4[2] = { 7.0 * KOhm,  7.4 * KOhm};
-double BUTTON_NUM3[2] = {48.0 * KOhm, 48.3 * KOhm};
+double BUTTON_NUM3[2] = {48.0 * KOhm, 49.3 * KOhm};
 double BUTTON_NUM2[2] = { 2.7 * KOhm,  3.0 * KOhm};
-double BUTTON_NUM1[2] = {40.2 * KOhm, 40.5 * KOhm};
-double BUTTON_EQUA[2] = { 1.2 * KOhm,  1.5 * KOhm};
-double BUTTON_CLR [2] = { 4.1 * KOhm,  4.4 * KOhm};
+double BUTTON_NUM1[2] = {40.2 * KOhm, 40.7 * KOhm};
+double BUTTON_EQUA[2] = { 0.8 * KOhm,  1.6 * KOhm};
+double BUTTON_CLR [2] = { 4.0 * KOhm,  4.7 * KOhm};
 
 char getCharFromRes(double res) {
   if(res >= TOTAL_RES - 0.3 * KOhm) {
@@ -154,18 +157,23 @@ void updateState() {
     case 'I':
       break;
     case '=':
+      lastOp = currentState;
       last = 0.0;
       break;
     case '+':
+      lastOp = currentState;
       last = last + current;
       break;
     case '-':
+      lastOp = currentState;
       last = last - current;
       break;
     case '*':
+      lastOp = currentState;
       last = last * current;
       break;
     case '/':
+      lastOp = currentState;
       last = last / current;
       break;
   }
@@ -177,6 +185,7 @@ void handleChar(char ch) {
     if(currentState == '=') {
       resetAll();
     }
+    lastOp = ' ';
     current *= 10;
     current += (double)(ch - '0');
     displayDbl(current);
@@ -228,11 +237,8 @@ void handleChar(char ch) {
       return;
     case '#':
       updateState();
-      currentState = '*';
-      last = current;
-      current = -1.0;
-      updateState();
-      hasSign = true;
+      currentState = 'I';
+      current *= -1.0;
       showResult();
       return;
     default:
@@ -268,9 +274,16 @@ void loop() {
     lastTap = millis();
     handleChar(ch); 
   }
+  loopCnt += 1;
+  loopCnt %= 5;
+  if(loopCnt == 4) {
+    lastOp = ' ';
+  }
   const double currResist = getResistance();
   if(fabs_(currResist - oldResist) < 0.4 * KOhm) {
-    if(millis() - lastTap < 600) {
+    if(millis() - lastTap < 100) {
+      Serial.println("Tap too frequently");
+      delay(80);
       return;
     }
   }
@@ -281,7 +294,16 @@ void loop() {
   lastTap = millis();
   char ch = getCharFromRes(currResist);
   if(ch == 'N') {
+    delay(80);
     return;
+  }
+  if(lastOp != ' ') {
+    if(ch < '0' || ch > '9') {
+      Serial.print("Debounce: ");
+      Serial.println(ch);
+      delay(80);
+      return;
+    }
   }
   handleChar(ch);
   delay(80);
